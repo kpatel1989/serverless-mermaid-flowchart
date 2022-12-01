@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "outDir": "./lib",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "skipLibCheck":true,
+    "listFiles": false,
+    "lib": [
+      "es2016",
+      "dom"
+    ]
+  },
+  "include" :[
+    "*.ts",
+    "src/**/*"
+  ],
+  "exclude": [
+    ".vscode",
+    ".serverless",
+    ".git",
+    "node_modules",
+    "webpack.config.js"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": {
+    "rewriteTsconfig": false
+  }
+}
