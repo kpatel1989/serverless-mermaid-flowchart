@@ -8,6 +8,7 @@ export interface Options {
   rootFolder: string;
   projectType: 'Serverless' | 'Stencil';
   entryFile: string;
+  ignoreList: string[]
 }
 
 export const parseProject = async (
@@ -26,7 +27,8 @@ export const parseProject = async (
   // }
   const handlerFunctions = await parseTypeScriptFile(
     'handler',
-    path.resolve(options.rootFolder, handlerPath)
+    path.resolve(options.rootFolder, handlerPath),
+    options.ignoreList
   );
   // printNodeTree('handler',path.resolve(options.rootFolder, handlerPath));
   return functionHandlerMap.concat(handlerFunctions);

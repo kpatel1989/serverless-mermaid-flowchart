@@ -3,22 +3,21 @@ import * as fs from 'fs';
 import { FunctionHandler } from '../interfaces/function-handler';
 
 export const printNodeTree = async (fileName: string, filePath: string) => {
-
   const sourceFile = ts.createSourceFile(
     fileName,
     fs.readFileSync(filePath).toString(),
     ts.ScriptTarget.ES5,
     /*setParentNodes */ true
   );
-  const tree =  sourceFile.statements.map( (node) => getNodeTree(node));
+  const tree = sourceFile.statements.map((node) => getNodeTree(node));
   fs.writeFileSync(`${__dirname}/tree.json`, JSON.stringify(tree));
-}
-export const parseTypeScriptFile = async (fileName: string, filePath: string): Promise<FunctionHandler[]> => {
+};
+export const parseTypeScriptFile = async (fileName: string, filePath: string, ignoreList): Promise<FunctionHandler[]> => {
   async function parseNode(node, allExports) {
     const { name, functionNode } = getExportFunction(node);
     if (name !== '' && functionNode != null) {
       const nodeTree = getNodeTree(functionNode);
-      const handlers = await getAllfunctionCalls(functionNode);
+      const handlers = await getAllfunctionCalls(functionNode, ignoreList);
       console.log(name, handlers);
       allExports.push({
         function: `${fileName}.${name}`,
@@ -62,31 +61,36 @@ function getChildByHierarchy(node, hierarchy, level = 0) {
   return level == hierarchy.length - 1 ? foundNode : null;
 }
 
-async function getAllfunctionCalls(node) {
+async function getAllfunctionCalls(node, ignoreList) {
   const functionCalls = [];
   // Block.SyntaxList.ExpressionStatement[].AwaitExpression|CallExpression
   const syntaxList = getChildByHierarchy(node, [ts.SyntaxKind.Block, ts.SyntaxKind.SyntaxList]);
   if (syntaxList) {
     const expressionStatements = getChildrenByType(syntaxList, ts.SyntaxKind.ExpressionStatement);
     await expressionStatements.map((expressionStatement) => {
-      let identifier =
-        getChildByHierarchy(expressionStatement, [
-          ts.SyntaxKind.AwaitExpression,
-          ts.SyntaxKind.CallExpression,
-          ts.SyntaxKind.Identifier,
-        ]) ||
+      let callExpression =
+        getChildByHierarchy(expressionStatement, [ts.SyntaxKind.AwaitExpression, ts.SyntaxKind.CallExpression]) ||
         getChildByHierarchy(expressionStatement, [ts.SyntaxKind.CallExpression, ts.SyntaxKind.Identifier]) ||
-        getChildByHierarchy(expressionStatement, [
-          ts.SyntaxKind.CallExpression,
-          ts.SyntaxKind.PropertyAccessExpression,
-        ]) ||
-        getChildByHierarchy(expressionStatement, [
-          ts.SyntaxKind.CallExpression,
-          ts.SyntaxKind.CallExpression,
-          ts.SyntaxKind.PropertyAccessExpression,
-        ]);
-      if (identifier) {
-        functionCalls.push(identifier.getFullText().trim());
+        getChildByHierarchy(expressionStatement, [ts.SyntaxKind.CallExpression, ts.SyntaxKind.CallExpression]) ||
+        getChildByHierarchy(expressionStatement, [ts.SyntaxKind.CallExpression]);
+      if (callExpression) {
+        const identifier =
+          getChildByType(callExpression, ts.SyntaxKind.PropertyAccessExpression) ||
+          getChildByType(callExpression, ts.SyntaxKind.Identifier);
+        if (identifier) {
+          const functionIdentifier = identifier.getFullText().trim();
+          if (!ignoreList.includes(functionIdentifier)) {
+            functionCalls.push(functionIdentifier);
+          }
+          // check for callback functions
+          let callbackIdentifier = getChildByHierarchy(callExpression, [
+            ts.SyntaxKind.SyntaxList,
+            ts.SyntaxKind.PropertyAccessExpression,
+          ]);
+          if (callbackIdentifier) {
+            functionCalls.push(callbackIdentifier.getFullText().trim());
+          }
+        }
       }
     });
   }

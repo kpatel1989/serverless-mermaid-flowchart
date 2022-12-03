@@ -6,6 +6,7 @@ describe('Test Graph generation', () => {
         rootFolder: '/Users/kartik.patel/Documents/newwave/ol-nw-watchlist',
         projectType: 'Serverless',
         entryFile: 'src/main/typescript/handler.ts',
+        ignoreList:  ['HttpRuntime.createHttpHandler']
       };
     it('should generate a mermaid graph for the test repo.', async() => {
         await generateGraph(options);
