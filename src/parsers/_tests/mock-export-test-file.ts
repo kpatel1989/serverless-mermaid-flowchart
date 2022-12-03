@@ -1,7 +1,21 @@
-exports.testFun1 = (arg: any) => {};
-exports.testFun2 = async (arg: any) => {};
+exports.testFun1 = (arg: any) => {
+  let a = [];
+  constFunction();
+  objTest2.test();
+};
+exports.testFun2 = async (arg: any) => {
+  constFunction();
+  anotherType();
+  await constFunction2();
+  traditionalFunction2();
+};
 
 exports.objTest = 'Hello'
+const objTest2 = {
+  test: () => {
+
+  }
+}
 
 export const CONST_OBJ = [];
 export const constFunction = () => {};

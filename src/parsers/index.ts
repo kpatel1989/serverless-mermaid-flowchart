@@ -2,7 +2,7 @@ import * as path from 'path';
 import { FunctionHandler } from '../interfaces/function-handler';
 import { doesFileExists } from '../utils/file-exists';
 import { parseServerlessYml } from './serverless-yml-parser';
-import { parseTypeScriptFile } from './typescript-parser';
+import { parseTypeScriptFile, printNodeTree } from './typescript-parser';
 
 export interface Options {
   rootFolder: string;
@@ -28,5 +28,6 @@ export const parseProject = async (
     'handler',
     path.resolve(options.rootFolder, handlerPath)
   );
+  // printNodeTree('handler',path.resolve(options.rootFolder, handlerPath));
   return functionHandlerMap.concat(handlerFunctions);
 };
