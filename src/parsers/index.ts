@@ -1,35 +1,18 @@
 import * as path from 'path';
-import { FunctionHandler } from '../interfaces/function-handler';
-import { doesFileExists } from '../utils/file-exists';
+import { Options } from '../interfaces/Options';
+import { MermaidMap } from '../interfaces/function-handler';
 import { parseServerlessYml } from './serverless-yml-parser';
-import { parseTypeScriptFile, printNodeTree } from './typescript-parser';
+import { TsFile } from './typescript-file-parser';
 
-export interface Options {
-  rootFolder: string;
-  projectType: 'Serverless' | 'Stencil';
-  entryFile: string;
-  ignoreList: string[]
-}
-
-export const parseProject = async (
-  options: Options
-): Promise<FunctionHandler[] | null> => {
+export const parseProject = (options: Options): MermaidMap[] | null => {
   console.log('Parsing Serverless.yml');
   const serverlessYmlPath = path.join(options.rootFolder, 'serverless.yml');
 
-  const functionHandlerMap:FunctionHandler[] = parseServerlessYml(serverlessYmlPath);
+  const functionHandlerMap: MermaidMap[] = parseServerlessYml(serverlessYmlPath);
 
-  const handlerPath = options.entryFile;
-  console.log('handler ', path.join(options.rootFolder, handlerPath));
-  // if ((await doesFileExists(path.join(options.rootFolder, handlerPath)))!) {
-  //   console.error('Handler file not found.');
-  //   return null;
-  // }
-  const handlerFunctions = await parseTypeScriptFile(
-    'handler',
-    path.resolve(options.rootFolder, handlerPath),
-    options.ignoreList
-  );
-  // printNodeTree('handler',path.resolve(options.rootFolder, handlerPath));
+  const tsFile = new TsFile('handler', path.resolve(options.rootFolder, options.entryFile), options);
+  const handlerFunctions = tsFile.parse();
+
+  console.log(handlerFunctions);
   return functionHandlerMap.concat(handlerFunctions);
 };

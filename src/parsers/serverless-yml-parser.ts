@@ -1,8 +1,8 @@
-import { FunctionHandler } from "../interfaces/function-handler";
+import { MermaidMap } from "../interfaces/function-handler";
 
 const { Config } = require('sls-config-parser');
 
-export const parseServerlessYml = (filePath: string): FunctionHandler[] => {
+export const parseServerlessYml = (filePath: string): MermaidMap[] => {
   const customCfg = new Config({
     stage: 'prod',
     _path: filePath,
@@ -11,8 +11,8 @@ export const parseServerlessYml = (filePath: string): FunctionHandler[] => {
   return Object.keys(configs.functions).map((fun) => {
     
     return {
-      function: fun,
-      handler: [configs.functions[fun].handler],
+      lhs: fun,
+      rhs: [configs.functions[fun].handler],
     };
   });
 };

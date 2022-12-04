@@ -1,5 +1,5 @@
 import { generateGraph } from "..";
-import { Options } from "../parsers";
+import { Options } from "../interfaces/Options";
 
 describe('Test Graph generation', () => {
     const options: Options = {
@@ -8,8 +8,7 @@ describe('Test Graph generation', () => {
         entryFile: 'src/main/typescript/handler.ts',
         ignoreList:  ['HttpRuntime.createHttpHandler']
       };
-    it('should generate a mermaid graph for the test repo.', async() => {
-        await generateGraph(options);
-        
+    test('should generate a mermaid graph for the test repo.', () => {
+        generateGraph(options);
     });
 })

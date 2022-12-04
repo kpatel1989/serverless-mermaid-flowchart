@@ -1,4 +1,4 @@
-export interface FunctionHandler {
-    function: string;
-    handler: string[];
+export interface MermaidMap {
+    lhs: string;
+    rhs: string[];
 }
