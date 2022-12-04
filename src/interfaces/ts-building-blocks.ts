@@ -30,29 +30,31 @@
     ---- arguments
   */
 
-interface VariableNode {}
-interface ImportNode {
-  variables: VariableNode[]
+export interface VariableNode {}
+export interface ImportNode {
+  filePath: string;
+  variables?: VariableNode[]
 }
 
-interface ExportNodes {
+export interface ExportNode {
+  functionName: string;
   functionBlock: FunctionBlock;
 }
-interface FunctionCall {
+
+export interface FunctionCall {
   variables: VariableNode[];
   functionCall: FunctionCall[];
 }
 
-interface FunctionBlock {
-  variableDeclarations: VariableNode[];
-  imports: ImportNode[];
-  functionCalls:  FunctionCall[]
+export interface FunctionBlock {
+  variableDeclarations?: VariableNode[];
+  imports?: ImportNode[];
+  functionCalls?:  string[]
 }
 
-interface TsFile {
+export interface TsFile {
   imports: ImportNode[];
-  exports: ExportNodes[];
+  exports: ExportNode[];
   variableDeclarations: VariableNode[];
   functionBlocks: FunctionBlock[];
-
 }

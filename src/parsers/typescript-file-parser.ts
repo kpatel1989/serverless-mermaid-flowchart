@@ -1,16 +1,13 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
+import * as path from 'path';
 import { MermaidMap } from '../interfaces/function-handler';
-import {
-  getChildByHierarchy,
-  getChildByType,
-  getChildrenByType,
-  getNodeTree,
-  printAllChildren,
-} from '../utils/ts-node-parser';
+import { getNodeTree, printAllChildren } from '../utils/ts-node-parser';
 import { Options } from '../interfaces/Options';
 import { getAllFunctionCalls } from '../utils/function-calls';
 import { getExportFunction } from '../utils/export-function';
+import { ExportNode, FunctionBlock, ImportNode } from '../interfaces/ts-building-blocks';
+import { getImportFile } from '../utils/imports';
 
 export const printNodeTree = (fileName: string, filePath: string) => {
   const sourceFile = ts.createSourceFile(
@@ -28,6 +25,9 @@ export class TsFile {
   options: Options;
   sourceFile: ts.SourceFile;
 
+  exports: ExportNode[];
+  imports: ImportNode[];
+
   constructor(fileName, filePath, options) {
     this.fileName = fileName;
     this.filePath = filePath;
@@ -40,23 +40,41 @@ export class TsFile {
     );
   }
 
-  parseNode(node, allExports) {
+  parseNode(node) {
     const { name, functionNode } = getExportFunction(node);
     if (name !== '' && functionNode != null) {
       const nodeTree = getNodeTree(functionNode);
       const handlers = getAllFunctionCalls(functionNode);
-      allExports.push({
-        lhs: `${this.fileName}.${name}`,
-        rhs: handlers,
+      this.exports.push({
+        functionName: name,
+        functionBlock: <FunctionBlock>{
+          functionCalls: handlers,
+        },
       });
     }
-    node.getChildren().map((n) => this.parseNode(n, allExports));
+    const { fileName } = getImportFile(node);
+    if (fileName && fileName != '') {
+      let filePath = path.resolve(path.dirname(this.filePath), fileName);
+      filePath = fileName.endsWith('.ts') ? filePath : filePath + '.ts';
+      if (fs.existsSync(filePath)) {
+        this.imports.push({
+          filePath,
+        });
+      }
+    }
+    node.getChildren().map((n) => this.parseNode(n));
   }
 
   public parse(): MermaidMap[] {
-    const allExports: MermaidMap[] = [];
-
-    this.sourceFile.statements.map((node) => this.parseNode(node, allExports));
-    return allExports;
+    this.exports = [];
+    this.imports = [];
+    this.sourceFile.statements.map((node) => this.parseNode(node));
+    console.log(this.imports);
+    return this.exports.map((fn) => {
+      return {
+        lhs: `${this.fileName}.${fn.functionName}`,
+        rhs: fn.functionBlock.functionCalls,
+      };
+    });
   }
 }

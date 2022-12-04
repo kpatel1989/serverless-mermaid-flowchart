@@ -4,7 +4,7 @@ import { MermaidMap } from '../../interfaces/function-handler';
 import { printNodeTree, TsFile } from '../typescript-file-parser';
 
 describe('Parsing Typescript file', () => {
-  test('should identify all exported functions defined in the file', () => {
+  test.skip('should identify all exported functions defined in the file', () => {
     const tsFile = new TsFile('test', path.resolve('src/parsers/_tests/mock-export-test-file.ts'), { ignoreList: [] });
     const result: MermaidMap[] = tsFile.parse();
     console.log(result);
