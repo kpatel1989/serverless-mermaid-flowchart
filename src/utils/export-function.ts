@@ -63,8 +63,5 @@ export function getExportFunction(node) {
         };
       }
     }
-    return {
-      name: '',
-      functionNode: null,
-    };
+    return null;
   }

@@ -7,7 +7,7 @@ import { parseProject } from './parsers';
 
 export async function generateGraph(options: Options) {
   console.log('Parsing Project');
-  const projectMap: MermaidMap[] | null = parseProject(options);
+  const projectMap: MermaidMap[] | null = await parseProject(options);
 
   if (projectMap) {
     console.log('Generating mermaid Graph');

@@ -8,6 +8,9 @@
 // Comments
 // Variable Scope and closures
 
+import { TsFile } from "../utils/ts-file";
+import { MermaidMap } from "./function-handler";
+
 /*
     imports
     exports
@@ -33,7 +36,8 @@
 export interface VariableNode {}
 export interface ImportNode {
   filePath: string;
-  variables?: VariableNode[]
+  variables?: VariableNode[];
+  tsFile?: TsFile;
 }
 
 export interface ExportNode {
@@ -50,11 +54,4 @@ export interface FunctionBlock {
   variableDeclarations?: VariableNode[];
   imports?: ImportNode[];
   functionCalls?:  string[]
-}
-
-export interface TsFile {
-  imports: ImportNode[];
-  exports: ExportNode[];
-  variableDeclarations: VariableNode[];
-  functionBlocks: FunctionBlock[];
 }

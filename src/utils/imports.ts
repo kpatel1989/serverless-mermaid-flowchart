@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { getChildByHierarchy, getChildByType, getChildrenByType } from './ts-node-parser';
+import { getChildByType } from './ts-node-parser';
 
 export function getImportFile(node) {
   if (node.kind === ts.SyntaxKind.ImportDeclaration) {

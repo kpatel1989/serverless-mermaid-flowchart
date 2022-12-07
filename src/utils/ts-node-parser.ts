@@ -46,3 +46,16 @@ export function getChildByHierarchy(node, hierarchy, level = 0) {
   }
   return level == hierarchy.length - 1 ? foundNode : null;
 }
+
+export function getChildrenByRecursiveHierarchy(node, hierarchy, level = 0) {
+  const filteredNodes = node.getChildren().filter((n) => n.kind === hierarchy[level]);
+  if (filteredNodes.length > 0 && level < hierarchy.length - 1) {
+    for (let i = 0; i < filteredNodes.length; i++) {
+      const foundChild = getChildrenByRecursiveHierarchy(filteredNodes[i], hierarchy, level + 1);
+      if (foundChild && foundChild.length>0) {
+        return foundChild;
+      }
+    }
+  }
+  return level == hierarchy.length - 1 ? filteredNodes : null;
+}
